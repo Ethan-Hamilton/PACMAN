@@ -1,0 +1,414 @@
+@font-face {
+    font-family: 'Pacmania';
+    src: url('fonts/Pacmania.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Pacmania';
+    src: url('fonts/Pacmania Italic.otf') format('opentype');
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Emulogic';
+    src: url('fonts/Emulogic-zrEw.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    background-color: black;
+  }
+  
+  #pacman {
+    height: 470px;
+    width: 382px;
+    border-radius: 5px;
+    margin: 20px auto;
+  }
+  
+  #shim {
+    font-family: 'Permanent Marker', cursive;
+    position: absolute;
+    visibility: hidden
+  }
+  
+  h1 {
+    font-family: 'Permanent Marker', cursive;
+    text-align: center;
+    color: yellow;
+  }
+
+  .game-title {
+    font-family: 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+    font-size: 48px;
+    font-weight: normal;
+    text-align: center;
+    color: #FFFF00;
+    margin: 20px 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  
+  body {
+    width: 382px;
+    margin: 0px auto;
+    font-family: sans-serif;
+  }
+  
+  a {
+    text-decoration: none;
+    color: #0000FF;
+  }
+
+  /* Start Game Modal Styles */
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .modal-content {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    border: 3px solid #FFFF00;
+    border-radius: 15px;
+    padding: 30px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(255, 255, 0, 0.5);
+    animation: modalSlideIn 0.5s ease-out;
+  }
+
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: scale(0.8) translateY(-50px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  .modal-header {
+    margin-bottom: 20px;
+  }
+
+  .modal-title {
+    font-family: 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+    font-size: 32px;
+    color: #FFFF00;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    letter-spacing: 2px;
+  }
+
+  .modal-body {
+    margin: 20px 0;
+  }
+
+  .character-icons {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 15px 0;
+    align-items: center;
+  }
+
+  .character-icon {
+    animation: characterPulse 2s infinite;
+  }
+
+  .character-icon:nth-child(2) {
+    animation-delay: 1s;
+  }
+
+  @keyframes characterPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  .modal-text {
+    font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+    font-size: 16px;
+    color: #FFFFFF;
+    margin: 8px 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    letter-spacing: 1px;
+  }
+
+  .modal-footer {
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .start-btn, .sound-btn, .settings-btn {
+    font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+    font-size: 18px;
+    padding: 12px 24px;
+    border: 2px solid #FFFF00;
+    border-radius: 8px;
+    color: #FFFFFF;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+  }
+
+  .start-btn, .settings-btn {
+    background: #0000FF;
+    border: 2px solid #FFFF00;
+  }
+
+  .start-btn:hover, .settings-btn:hover {
+    background: #3333FF;
+    border: 2px solid #FFFF00;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 255, 0.6);
+  }
+
+  .sound-btn {
+    background: linear-gradient(135deg, #CC0000 0%, #FF0000 100%);
+    font-size: 16px;
+  }
+
+  .sound-btn:hover {
+    background: linear-gradient(135deg, #FF0000 0%, #FF3333 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+  }
+
+  .sound-btn.muted {
+    background: linear-gradient(135deg, #666666 0%, #888888 100%);
+  }
+
+  .sound-btn.muted:hover {
+    background: linear-gradient(135deg, #888888 0%, #AAAAAA 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(136, 136, 136, 0.4);
+  }
+
+  .start-btn:active, .sound-btn:active {
+    transform: translateY(0);
+  }
+
+  /* Settings Button inherits from main button group */
+
+  /* Settings Modal Styles */
+  .settings-section {
+    margin: 20px 0;
+    text-align: left;
+  }
+
+  .settings-section h3 {
+    font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+    font-size: 20px;
+    color: #FFFF00;
+    margin: 0 0 15px 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  }
+
+  .settings-option-btn {
+    font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+    font-size: 16px;
+    padding: 8px 16px;
+    border: 2px solid #FFFF00;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #0066CC 0%, #0088FF 100%);
+    color: #FFFFFF;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+  }
+
+  .settings-option-btn:hover {
+    background: linear-gradient(135deg, #0088FF 0%, #00AAFF 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 136, 255, 0.4);
+  }
+
+  .settings-text {
+    font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+    font-size: 14px;
+    color: #FFFFFF;
+    margin: 5px 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    letter-spacing: 1px;
+  }
+
+  .colour-option {
+    margin: 15px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .colour-label {
+    font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+    font-size: 14px;
+    color: #FFFFFF;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    letter-spacing: 1px;
+    flex: 1;
+  }
+
+  .colour-picker {
+    width: 50px;
+    height: 40px;
+    border: 2px solid #FFFF00;
+    border-radius: 6px;
+    cursor: pointer;
+    background: none;
+    padding: 0;
+  }
+
+  .colour-picker:hover {
+    border-color: #FFFFFF;
+    transform: scale(1.1);
+    transition: all 0.3s ease;
+  }
+
+  .colour-reset-section {
+    margin: 20px 0 10px 0;
+    text-align: center;
+  }
+
+  .close-btn {
+    font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+    font-size: 18px;
+    padding: 12px 24px;
+    border: 2px solid #FFFF00;
+    border-radius: 8px;
+    color: #FFFFFF;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    background: linear-gradient(135deg, #CC0000 0%, #FF0000 100%);
+  }
+
+  .close-btn:hover {
+    background: linear-gradient(135deg, #FF0000 0%, #FF3333 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+  }
+
+  .close-btn:active {
+    transform: translateY(0);
+  }
+
+  /* Hide modal when game starts */
+  .modal.hidden {
+    display: none;
+  }
+
+  /* Game Controls Styles */
+  .game-controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+    transition: all 0.3s ease;
+  }
+
+  .game-controls.hidden {
+    display: none;
+  }
+
+  .control-btn {
+    font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+    font-size: 14px;
+    padding: 8px 12px;
+    border: 2px solid #FFFF00;
+    border-radius: 8px;
+    color: #FFFFFF;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 100px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .control-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 255, 0, 0.4);
+  }
+
+  .control-btn:active {
+    transform: translateY(0);
+  }
+
+  .pause-btn {
+    background: linear-gradient(135deg, #FF6B00 0%, #FF8C00 100%);
+  }
+
+  .pause-btn:hover {
+    background: linear-gradient(135deg, #FF8C00 0%, #FFA500 100%);
+  }
+
+  .quit-btn {
+    background: linear-gradient(135deg, #CC0000 0%, #FF0000 100%);
+  }
+
+  .quit-btn:hover {
+    background: linear-gradient(135deg, #FF0000 0%, #FF3333 100%);
+  }
+
+  .control-btn.settings-btn {
+    background: linear-gradient(135deg, #0066CC 0%, #0088FF 100%);
+  }
+
+  .control-btn.settings-btn:hover {
+    background: linear-gradient(135deg, #0088FF 0%, #00AAFF 100%);
+  }
+
+  .btn-text {
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 480px) {
+    .game-controls {
+      top: 10px;
+      right: 10px;
+      gap: 8px;
+    }
+    
+    .control-btn {
+      font-size: 12px;
+      padding: 6px 10px;
+      min-width: 80px;
+    }
+    
+    .btn-text {
+      font-size: 12px;
+    }
+  }

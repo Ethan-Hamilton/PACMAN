@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML5 Pacman</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+</head>
+<body>
+    <div id="shim">shim for font face</div>
+
+    <h1 class="game-title">PACMAN</h1>
+
+    <!-- Start Game Modal -->
+    <div id="start-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">READY TO PLAY?</h2>
+            </div>
+            <div class="modal-body">
+                <div class="character-icons">
+                    <div class="character-icon">
+                        <canvas id="pacman-canvas" width="60" height="60"></canvas>
+                    </div>
+                    <div class="character-icon">
+                        <canvas id="ghost-canvas" width="60" height="60"></canvas>
+                    </div>
+                </div>
+                <p class="modal-text">Use arrow keys to move</p>
+                <p class="modal-text">Eat all dots to advance</p>
+                <p class="modal-text">Avoid the ghosts!</p>
+            </div>
+            <div class="modal-footer">
+                <button id="start-game-btn" class="start-btn">LET'S GO!!!</button>
+                <button id="settings-btn" class="settings-btn">SETTINGS</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">SETTINGS</h2>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h3>Colours</h3>
+                    <div class="colour-option">
+                        <label class="colour-label">Map Wall Colour:</label>
+                        <input type="color" id="wall-colour-picker" class="colour-picker" value="#0000FF">
+                    </div>
+                    <div class="colour-option">
+                        <label class="colour-label">Pacman Colour:</label>
+                        <input type="color" id="pacman-colour-picker" class="colour-picker" value="#FFFF00">
+                    </div>
+                    <div class="colour-reset-section">
+                        <button id="reset-colours-btn" class="settings-option-btn">
+                            RESET TO DEFAULT
+                        </button>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h3>Audio</h3>
+                    <button id="sound-toggle-settings" class="settings-option-btn">
+                        SOUND ON
+                    </button>
+                </div>
+                <div class="settings-section">
+                    <h3>Controls</h3>
+                    <p class="settings-text">Arrow Keys: Move Pacman</p>
+                    <p class="settings-text">Spacebar: Start Game</p>
+                    <p class="settings-text">P: Pause Game</p>
+                    <p class="settings-text">H: Return to Home</p>
+                    <p class="settings-text">S: Toggle Sound</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="close-settings-btn" class="close-btn">CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Controls -->
+    <div id="game-controls" class="game-controls hidden">
+        <button id="pause-btn" class="control-btn pause-btn" title="Pause Game (P)">
+            <span class="btn-text">PAUSE</span>
+        </button>
+        <button id="game-settings-btn" class="control-btn settings-btn" title="Settings (S)">
+            <span class="btn-text">SETTINGS</span>
+        </button>
+        <button id="home-btn" class="control-btn quit-btn" title="Return to Menu (H)">
+            <span class="btn-text">QUIT</span>
+        </button>
+    </div>
+
+    <div id="pacman"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
