@@ -140,7 +140,7 @@ pacman/
 ## 🖼️ Visual Showcase
 
 ### 🎮 Game Icon
-![Game Favicon](favicon.ico)
+<img src="favicon.ico" alt="Game Favicon" width="48" height="48">
 *Custom favicon representing the classic Pacman character*
 
 ### 🎨 Font Preview
