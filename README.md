@@ -1,6 +1,6 @@
-# 🎮 PACMAN - HTML5 Canvas Game
-
 <div align="center">
+
+# PACMAN
 
 ![Pacman Favicon](favicon.ico)
 
