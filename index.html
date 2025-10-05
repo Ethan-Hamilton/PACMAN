@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML5 Pacman</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>PACMAN</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -12,7 +13,16 @@
 <body>
     <div id="shim">shim for font face</div>
 
-    <h1 class="game-title">PACMAN</h1>
+    <div class="title-container">
+        <h1 class="game-title">PACMAN</h1>
+        <button id="title-menu-btn" class="title-menu-btn" title="Game Menu">
+            <div class="hamburger-icon">
+                <div class="hamburger-line"></div>
+                <div class="hamburger-line"></div>
+                <div class="hamburger-line"></div>
+            </div>
+        </button>
+    </div>
 
     <!-- Start Game Modal -->
     <div id="start-modal" class="modal">
@@ -29,7 +39,7 @@
                         <canvas id="ghost-canvas" width="60" height="60"></canvas>
                     </div>
                 </div>
-                <p class="modal-text">Use arrow keys to move</p>
+                <p class="modal-text">Use arrow keys or swipe to move</p>
                 <p class="modal-text">Eat all dots to advance</p>
                 <p class="modal-text">Avoid the ghosts!</p>
             </div>
@@ -72,7 +82,7 @@
                 <div class="settings-section">
                     <h3>Controls</h3>
                     <p class="settings-text">Arrow Keys: Move Pacman</p>
-                    <p class="settings-text">Spacebar: Start Game</p>
+                    <p class="settings-text">Touch/Swipe: Move Pacman (Mobile)</p>
                     <p class="settings-text">P: Pause Game</p>
                     <p class="settings-text">H: Return to Home</p>
                     <p class="settings-text">S: Toggle Sound</p>
@@ -86,18 +96,62 @@
 
     <!-- Game Controls -->
     <div id="game-controls" class="game-controls hidden">
-        <button id="pause-btn" class="control-btn pause-btn" title="Pause Game (P)">
-            <span class="btn-text">PAUSE</span>
-        </button>
-        <button id="game-settings-btn" class="control-btn settings-btn" title="Settings (S)">
-            <span class="btn-text">SETTINGS</span>
-        </button>
-        <button id="home-btn" class="control-btn quit-btn" title="Return to Menu (H)">
-            <span class="btn-text">QUIT</span>
-        </button>
+    </div>
+
+    <!-- Game Menu Modal -->
+    <div id="game-menu-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">GAME MENU</h2>
+            </div>
+            <div class="modal-body">
+                <div class="game-menu-buttons">
+                    <button id="resume-btn" class="game-menu-btn resume-menu-btn">
+                        <span class="btn-text">RESUME</span>
+                    </button>
+                    <button id="settings-menu-btn" class="game-menu-btn settings-menu-btn">
+                        <span class="btn-text">SETTINGS</span>
+                    </button>
+                    <button id="quit-menu-btn" class="game-menu-btn quit-menu-btn">
+                        <span class="btn-text">QUIT</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="pacman"></div>
+    
+    <!-- Game Over Modal -->
+    <div id="game-over-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">GAME OVER</h2>
+            </div>
+            <div class="modal-body">
+                <div class="game-over-stats">
+                    <div class="stat-item">
+                        <p class="modal-text">Final Score</p>
+                        <p class="stat-number" id="final-score">0</p>
+                    </div>
+                    <div class="stat-item">
+                        <p class="modal-text">Level Reached</p>
+                        <p class="stat-number" id="final-level">1</p>
+                    </div>
+                </div>
+                <p class="modal-text">Better luck next time!</p>
+            </div>
+            <div class="modal-footer">
+                <button id="restart-game-btn" class="start-btn">PLAY AGAIN</button>
+                <button id="game-over-home-btn" class="settings-btn">HOME</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Start Button -->
+    <div id="game-start-container" class="game-start-container">
+        <button id="game-start-btn" class="game-start-btn">START GAME</button>
+    </div>
 
     <script src="script.js"></script>
 </body>
