@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Pacman Logo](https://img.shields.io/badge/PACMAN-FFD700?style=for-the-badge&logo=pac-man&logoColor=black&labelColor=0000FF)
+![Pacman Favicon](favicon.ico)
 
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
@@ -137,6 +137,22 @@ pacman/
 └── README.md          # You are here!
 ```
 
+## 🖼️ Visual Showcase
+
+### 🎮 Game Icon
+![Game Favicon](favicon.ico)
+*Custom favicon representing the classic Pacman character*
+
+### 🎨 Font Preview
+The game uses authentic arcade fonts from the `assets/fonts/` directory:
+- **Emulogic**: Classic arcade-style font for retro authenticity
+- **Pacmania**: Custom Pacman-themed fonts for enhanced branding
+
+### 🎵 Audio Files
+Located in `assets/audio/` directory:
+- High-quality OGG audio files for optimal web performance
+- Classic sound effects that capture the original arcade experience
+
 ## 🎮 Gameplay Tips
 
 1. **💊 Power Pills** - Eat the large dots to turn ghosts blue and vulnerable
@@ -173,6 +189,19 @@ pacman/
 ## 🎵 Audio Credits
 
 Sound effects are from the original Pac-Man arcade game by Namco.
+
+## 🎨 Custom Assets
+
+- **Custom Fonts**: Authentic arcade-style fonts including:
+  - `Emulogic-zrEw.ttf` - Classic arcade font
+  - `Pacmania.otf` & `Pacmania Italic.otf` - Custom Pacman fonts
+- **Game Icon**: Custom `favicon.ico` for authentic branding
+- **Sound Effects**: 
+  - `pacman_beginning.ogg` - Game start sound
+  - `pacman_chomp.ogg` - Eating dots sound
+  - `pacman_death.ogg` - Death sound
+  - `pacman_eatghost.ogg` - Eating ghost sound
+  - `pacman_intermission.ogg` - Intermission music
 
 ## 📄 Font License
 
