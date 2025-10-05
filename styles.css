@@ -1,603 +1,800 @@
 @font-face {
-    font-family: 'Pacmania';
-    src: url('assets/fonts/Pacmania.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
+  font-family: 'Pacmania';
+  src: url('assets/fonts/Pacmania.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Pacmania';
-    src: url('assets/fonts/Pacmania Italic.otf') format('opentype');
-    font-weight: normal;
-    font-style: italic;
+  font-family: 'Pacmania';
+  src: url('assets/fonts/Pacmania Italic.otf') format('opentype');
+  font-weight: normal;
+  font-style: italic;
 }
 
 @font-face {
-    font-family: 'Emulogic';
-    src: url('assets/fonts/Emulogic-zrEw.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
+  font-family: 'Emulogic';
+  src: url('assets/fonts/Emulogic-zrEw.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  height: 100%;
+  overflow-x: hidden;
 }
 
 body {
-    background-color: black;
-  }
-  
-  #pacman {
-    height: 470px;
-    width: 382px;
-    border-radius: 5px;
-    margin: 20px auto;
-  }
-  
-  #shim {
-    font-family: 'Permanent Marker', cursive;
-    position: absolute;
-    visibility: hidden
-  }
-  
+  background-color: black;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 382px;
+  margin: 0 auto;
+  font-family: sans-serif;
+  position: relative;
+}
 
-  .title-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 20px 0;
-    padding: 0 10px;
-    position: relative;
-  }
+#shim {
+  font-family: 'Permanent Marker', cursive;
+  position: absolute;
+  visibility: hidden;
+}
 
-  .game-title {
-    font-family: 'Pacmania', 'Permanent Marker', cursive, sans-serif;
-    font-size: 48px;
-    font-weight: normal;
-    color: #FFFF00;
-    margin: 0;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
+#pacman {
+  height: 470px;
+  width: 382px;
+  border-radius: 5px;
+  margin: 20px auto;
+  max-width: 100%;
+}
 
-  .title-menu-btn {
-    background: #00AA00;
-    width: 45px;
-    height: 45px;
-    border-radius: 4px;
-    border: 2px solid #FFFF00;
-    font-family: 'Courier New', monospace;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    position: absolute;
-    right: 10px;
-  }
+a {
+  text-decoration: none;
+  color: #0000FF;
+}
 
-  .title-menu-btn.show {
-    display: flex;
-  }
+/* Title Container */
+.title-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px auto;
+  padding: 0 15px;
+  position: relative;
+  max-width: 100%;
+}
 
-  .title-menu-btn:hover {
-    background: #00CC00;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(255, 255, 0, 0.4);
-  }
+.game-title {
+  font-family: 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+  font-size: clamp(2rem, 8vw, 3rem);
+  font-weight: normal;
+  color: #FFFF00;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+}
 
-  .title-menu-btn:active {
-    transform: translateY(0);
-  }
-  
-  body {
-    width: 382px;
-    margin: 0px auto;
-    font-family: sans-serif;
-  }
-  
-  a {
-    text-decoration: none;
-    color: #0000FF;
-  }
+.title-menu-btn {
+  background: #00AA00;
+  width: 45px;
+  height: 45px;
+  border-radius: 4px;
+  border: 2px solid #FFFF00;
+  font-family: 'Courier New', monospace;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  position: absolute;
+  right: 10px;
+  flex-shrink: 0;
+}
 
-  /* Start Game Modal Styles */
-  .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
+.title-menu-btn.show {
+  display: flex;
+}
 
-  .modal-content {
-    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-    border: 3px solid #FFFF00;
-    border-radius: 15px;
-    padding: 30px;
-    max-width: 380px;
-    width: 85%;
-    text-align: center;
-    box-shadow: 0 0 30px rgba(255, 255, 0, 0.5);
-    animation: modalSlideIn 0.5s ease-out;
-  }
+.title-menu-btn:hover {
+  background: #00CC00;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 255, 0, 0.4);
+}
 
-  @keyframes modalSlideIn {
-    from {
+.title-menu-btn:active {
+  transform: translateY(0);
+}
+
+/* Modal Styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 15px;
+  overflow-y: auto;
+}
+
+.modal-content {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  border: 3px solid #FFFF00;
+  border-radius: 15px;
+  padding: clamp(20px, 5vw, 30px);
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(255, 255, 0, 0.5);
+  animation: modalSlideIn 0.5s ease-out;
+  margin: auto;
+}
+
+@keyframes modalSlideIn {
+  from {
       opacity: 0;
       transform: scale(0.8) translateY(-50px);
-    }
-    to {
+  }
+  to {
       opacity: 1;
       transform: scale(1) translateY(0);
-    }
   }
+}
 
-  .modal-header {
-    margin-bottom: 20px;
+.modal-header {
+  margin-bottom: 20px;
+}
+
+.modal-title {
+  font-family: 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+  font-size: clamp(1.5rem, 6vw, 2rem);
+  color: #FFFF00;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  letter-spacing: 2px;
+}
+
+.modal-body {
+  margin: 20px 0;
+}
+
+.character-icons {
+  display: flex;
+  justify-content: center;
+  gap: clamp(15px, 5vw, 30px);
+  margin: 15px 0;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.character-icon {
+  animation: characterPulse 2s infinite;
+  max-width: 60px;
+  height: auto;
+}
+
+.character-icon:nth-child(2) {
+  animation-delay: 1s;
+}
+
+@keyframes characterPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.modal-text {
+  font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+  font-size: clamp(0.75rem, 3vw, 1rem);
+  color: #FFFFFF;
+  margin: 8px 0;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  letter-spacing: 1px;
+  line-height: 1.4;
+}
+
+.modal-footer {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.start-btn, .settings-btn {
+  font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+  font-size: clamp(0.875rem, 3.5vw, 1.125rem);
+  padding: 12px 24px;
+  border: 2px solid #FFFF00;
+  border-radius: 8px;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
+  background: #0000FF;
+  min-height: 48px;
+  width: 100%;
+}
+
+.start-btn:hover, .settings-btn:hover {
+  background: #3333FF;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 255, 0.6);
+}
+
+.start-btn:active {
+  transform: translateY(0);
+}
+
+/* Settings Modal Styles */
+.settings-section {
+  margin: 20px 0;
+  text-align: left;
+}
+
+.settings-section h3 {
+  font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+  font-size: clamp(1rem, 4vw, 1.25rem);
+  color: #FFFF00;
+  margin: 0 0 15px 0;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.settings-option-btn {
+  font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+  font-size: clamp(0.75rem, 3vw, 1rem);
+  padding: 8px 16px;
+  border: 2px solid #FFFF00;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #0066CC 0%, #0088FF 100%);
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
+  min-height: 44px;
+}
+
+.settings-option-btn:hover {
+  background: linear-gradient(135deg, #0088FF 0%, #00AAFF 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 136, 255, 0.4);
+}
+
+.settings-text {
+  font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+  font-size: clamp(0.75rem, 3vw, 0.875rem);
+  color: #FFFFFF;
+  margin: 5px 0;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  letter-spacing: 1px;
+  line-height: 1.4;
+}
+
+.colour-option {
+  margin: 15px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 10px;
+}
+
+.colour-label {
+  font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+  font-size: clamp(0.75rem, 3vw, 0.875rem);
+  color: #FFFFFF;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  letter-spacing: 1px;
+  flex: 1;
+}
+
+.colour-picker {
+  width: clamp(50px, 15vw, 60px);
+  height: clamp(40px, 12vw, 50px);
+  border: 2px solid #FFFF00;
+  border-radius: 6px;
+  cursor: pointer;
+  background: none;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.colour-picker:hover {
+  border-color: #FFFFFF;
+  transform: scale(1.05);
+  transition: all 0.3s ease;
+}
+
+.colour-reset-section {
+  margin: 20px 0 10px 0;
+  text-align: center;
+}
+
+.close-btn {
+  font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+  font-size: clamp(0.875rem, 3.5vw, 1.125rem);
+  padding: 12px 24px;
+  border: 2px solid #FFFF00;
+  border-radius: 8px;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
+  background: linear-gradient(135deg, #CC0000 0%, #FF0000 100%);
+  min-height: 48px;
+  width: 100%;
+}
+
+.close-btn:hover {
+  background: linear-gradient(135deg, #FF0000 0%, #FF3333 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+}
+
+.close-btn:active {
+  transform: translateY(0);
+}
+
+.modal.hidden {
+  display: none;
+}
+
+/* Game Controls */
+.game-controls {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+
+.game-controls.hidden {
+  display: none;
+}
+
+.control-btn {
+  font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+  font-size: clamp(0.75rem, 3vw, 0.875rem);
+  padding: 8px 12px;
+  border: 2px solid #FFFF00;
+  border-radius: 8px;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+  min-height: 44px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.control-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 255, 0, 0.4);
+}
+
+.control-btn:active {
+  transform: translateY(0);
+}
+
+.control-btn.settings-btn {
+  background: linear-gradient(135deg, #0066CC 0%, #0088FF 100%);
+}
+
+.control-btn.settings-btn:hover {
+  background: linear-gradient(135deg, #0088FF 0%, #00AAFF 100%);
+}
+
+.hamburger-icon {
+  width: 32px;
+  height: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hamburger-line {
+  width: 100%;
+  height: 4px;
+  background-color: #FFFFFF;
+  border-radius: 0;
+}
+
+.btn-text {
+  font-size: clamp(0.75rem, 3vw, 0.875rem);
+  line-height: 1;
+}
+
+/* Game Menu Modal */
+.game-menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.game-menu-btn {
+  font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+  font-size: clamp(0.875rem, 3.5vw, 1.125rem);
+  padding: 12px 24px;
+  border: 2px solid #FFFF00;
+  border-radius: 8px;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
+  width: 100%;
+  max-width: 240px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.game-menu-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.game-menu-btn:active {
+  transform: translateY(-1px);
+}
+
+.resume-menu-btn {
+  background: linear-gradient(135deg, #00AA00 0%, #00CC00 100%);
+}
+
+.resume-menu-btn:hover {
+  background: linear-gradient(135deg, #00CC00 0%, #00EE00 100%);
+}
+
+.settings-menu-btn {
+  background: linear-gradient(135deg, #0066CC 0%, #0088FF 100%);
+}
+
+.settings-menu-btn:hover {
+  background: linear-gradient(135deg, #0088FF 0%, #00AAFF 100%);
+}
+
+.quit-menu-btn {
+  background: linear-gradient(135deg, #CC0000 0%, #FF0000 100%);
+}
+
+.quit-menu-btn:hover {
+  background: linear-gradient(135deg, #FF0000 0%, #FF3333 100%);
+}
+
+/* Game Start Container */
+.game-start-container {
+  text-align: center;
+  margin: 20px 0;
+  display: none;
+  padding: 0 15px;
+}
+
+.game-start-btn {
+  font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+  font-size: clamp(1rem, 4vw, 1.5rem);
+  padding: 15px 40px;
+  border: 3px solid #FFFF00;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0066CC 0%, #0088FF 100%);
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(0, 102, 204, 0.4);
+  min-height: 56px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.game-start-btn:hover {
+  background: linear-gradient(135deg, #0088FF 0%, #00AAFF 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 136, 255, 0.6);
+}
+
+.game-start-btn:active {
+  transform: translateY(-1px);
+}
+
+.game-start-container.show {
+  display: block;
+}
+
+/* Game Over Stats */
+.game-over-stats {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid #FFFF00;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 15px 0;
+  display: flex;
+  justify-content: space-around;
+  gap: clamp(10px, 3vw, 20px);
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  text-align: center;
+  flex: 1;
+  min-width: 80px;
+}
+
+.game-over-stats .modal-text {
+  font-size: clamp(0.75rem, 3vw, 1rem);
+  margin: 0 0 5px 0;
+  color: #FFFF00;
+  font-weight: bold;
+}
+
+.stat-number {
+  font-size: clamp(1.25rem, 5vw, 1.5rem);
+  margin: 0;
+  color: #FFFFFF;
+  font-weight: bold;
+  font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
+}
+
+/* Responsive Breakpoints */
+
+/* Large tablets and small desktops (768px - 1024px) */
+@media (max-width: 1024px) and (min-width: 769px) {
+  body {
+      max-width: 420px;
   }
+}
 
-  .modal-title {
-    font-family: 'Pacmania', 'Permanent Marker', cursive, sans-serif;
-    font-size: 32px;
-    color: #FFFF00;
-    margin: 0;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-    letter-spacing: 2px;
+/* Tablets (481px - 768px) */
+@media (max-width: 768px) {
+  body {
+      max-width: 100%;
+      padding: 0 10px;
   }
-
-  .modal-body {
-    margin: 20px 0;
+  
+  .title-container {
+      padding: 0 10px;
   }
-
-  .character-icons {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    margin: 15px 0;
-    align-items: center;
-  }
-
-  .character-icon {
-    animation: characterPulse 2s infinite;
-  }
-
-  .character-icon:nth-child(2) {
-    animation-delay: 1s;
-  }
-
-  @keyframes characterPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-  }
-
-  .modal-text {
-    font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
-    font-size: 16px;
-    color: #FFFFFF;
-    margin: 8px 0;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-    letter-spacing: 1px;
-  }
-
-  .modal-footer {
-    margin-top: 25px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .start-btn, .settings-btn {
-    font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
-    font-size: 18px;
-    padding: 12px 24px;
-    border: 2px solid #FFFF00;
-    border-radius: 8px;
-    color: #FFFFFF;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: bold;
-  }
-
-  .start-btn, .settings-btn {
-    background: #0000FF;
-    border: 2px solid #FFFF00;
-  }
-
-  .start-btn:hover, .settings-btn:hover {
-    background: #3333FF;
-    border: 2px solid #FFFF00;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 255, 0.6);
-  }
-
-  .start-btn:active {
-    transform: translateY(0);
-  }
-
-  /* Settings Modal Styles */
-  .settings-section {
-    margin: 20px 0;
-    text-align: left;
-  }
-
-  .settings-section h3 {
-    font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
-    font-size: 20px;
-    color: #FFFF00;
-    margin: 0 0 15px 0;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-  }
-
-  .settings-option-btn {
-    font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
-    font-size: 16px;
-    padding: 8px 16px;
-    border: 2px solid #FFFF00;
-    border-radius: 6px;
-    background: linear-gradient(135deg, #0066CC 0%, #0088FF 100%);
-    color: #FFFFFF;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: bold;
-  }
-
-  .settings-option-btn:hover {
-    background: linear-gradient(135deg, #0088FF 0%, #00AAFF 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 136, 255, 0.4);
-  }
-
-  .settings-text {
-    font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
-    font-size: 14px;
-    color: #FFFFFF;
-    margin: 5px 0;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-    letter-spacing: 1px;
-  }
-
-  .colour-option {
-    margin: 15px 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-  }
-
-  .colour-label {
-    font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
-    font-size: 14px;
-    color: #FFFFFF;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-    letter-spacing: 1px;
-    flex: 1;
-  }
-
-  .colour-picker {
-    width: 50px;
-    height: 40px;
-    border: 2px solid #FFFF00;
-    border-radius: 6px;
-    cursor: pointer;
-    background: none;
-    padding: 0;
-  }
-
-  .colour-picker:hover {
-    border-color: #FFFFFF;
-    transform: scale(1.1);
-    transition: all 0.3s ease;
-  }
-
-  .colour-reset-section {
-    margin: 20px 0 10px 0;
-    text-align: center;
-  }
-
-  .close-btn {
-    font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
-    font-size: 18px;
-    padding: 12px 24px;
-    border: 2px solid #FFFF00;
-    border-radius: 8px;
-    color: #FFFFFF;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: bold;
-    background: linear-gradient(135deg, #CC0000 0%, #FF0000 100%);
-  }
-
-  .close-btn:hover {
-    background: linear-gradient(135deg, #FF0000 0%, #FF3333 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
-  }
-
-  .close-btn:active {
-    transform: translateY(0);
-  }
-
-  /* Hide modal when game starts */
-  .modal.hidden {
-    display: none;
-  }
-
-  /* Game Controls Styles */
+  
   .game-controls {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 100;
-    transition: all 0.3s ease;
-  }
-
-  .game-controls.hidden {
-    display: none;
-  }
-
-  .control-btn {
-    font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
-    font-size: 14px;
-    padding: 8px 12px;
-    border: 2px solid #FFFF00;
-    border-radius: 8px;
-    color: #FFFFFF;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 100px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  }
-
-  .control-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(255, 255, 0, 0.4);
-  }
-
-  .control-btn:active {
-    transform: translateY(0);
-  }
-
-
-  .control-btn.settings-btn {
-    background: linear-gradient(135deg, #0066CC 0%, #0088FF 100%);
-  }
-
-  .control-btn.settings-btn:hover {
-    background: linear-gradient(135deg, #0088FF 0%, #00AAFF 100%);
-  }
-
-
-  .hamburger-icon {
-    width: 32px;
-    height: 24px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-
-  .hamburger-line {
-    width: 100%;
-    height: 4px;
-    background-color: #FFFFFF;
-    border-radius: 0;
-  }
-
-  .btn-text {
-    font-size: 14px;
-    line-height: 1;
-  }
-
-  /* Game Menu Modal Styles */
-  .game-menu-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    align-items: center;
-    margin: 20px 0;
-  }
-
-  .game-menu-btn {
-    font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
-    font-size: 18px;
-    padding: 12px 24px;
-    border: 2px solid #FFFF00;
-    border-radius: 8px;
-    color: #FFFFFF;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: bold;
-    width: 180px;
-    height: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  }
-
-  .game-menu-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-  }
-
-  .game-menu-btn:active {
-    transform: translateY(-1px);
-  }
-
-  .resume-menu-btn {
-    background: linear-gradient(135deg, #00AA00 0%, #00CC00 100%);
-  }
-
-  .resume-menu-btn:hover {
-    background: linear-gradient(135deg, #00CC00 0%, #00EE00 100%);
-  }
-
-  .settings-menu-btn {
-    background: linear-gradient(135deg, #0066CC 0%, #0088FF 100%);
-  }
-
-  .settings-menu-btn:hover {
-    background: linear-gradient(135deg, #0088FF 0%, #00AAFF 100%);
-  }
-
-  .quit-menu-btn {
-    background: linear-gradient(135deg, #CC0000 0%, #FF0000 100%);
-  }
-
-  .quit-menu-btn:hover {
-    background: linear-gradient(135deg, #FF0000 0%, #FF3333 100%);
-  }
-
-  /* Game Start Button */
-  .game-start-container {
-    text-align: center;
-    margin: 20px 0;
-    display: none;
-  }
-
-  .game-start-btn {
-    font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
-    font-size: 24px;
-    padding: 15px 40px;
-    border: 3px solid #FFFF00;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #0066CC 0%, #0088FF 100%);
-    color: #FFFFFF;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: bold;
-    box-shadow: 0 4px 15px rgba(0, 102, 204, 0.4);
-  }
-
-  .game-start-btn:hover {
-    background: linear-gradient(135deg, #0088FF 0%, #00AAFF 100%);
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 136, 255, 0.6);
-  }
-
-  .game-start-btn:active {
-    transform: translateY(-1px);
-  }
-
-  .game-start-container.show {
-    display: block;
-  }
-
-  /* Game Over Modal Styles */
-  .game-over-stats {
-    background: rgba(0, 0, 0, 0.3);
-    border: 2px solid #FFFF00;
-    border-radius: 10px;
-    padding: 15px;
-    margin: 15px 0;
-    display: flex;
-    justify-content: space-around;
-    gap: 20px;
-  }
-
-  .stat-item {
-    text-align: center;
-    flex: 1;
-  }
-
-  .game-over-stats .modal-text {
-    font-size: 16px;
-    margin: 0 0 5px 0;
-    color: #FFFF00;
-    font-weight: bold;
-  }
-
-  .stat-number {
-    font-size: 24px;
-    margin: 0;
-    color: #FFFFFF;
-    font-weight: bold;
-    font-family: 'Emulogic', 'Pacmania', 'Permanent Marker', cursive, sans-serif;
-  }
-
-  /* Mobile and touch device improvements */
-  @media (max-width: 480px) {
-    body {
-      width: 100%;
-      margin: 0;
-      padding: 10px;
-    }
-    
-    #pacman {
-      width: 100%;
-      max-width: 400px;
-      height: auto;
-      margin: 10px auto;
-    }
-    
-    .game-controls {
       top: 10px;
       right: 10px;
       gap: 8px;
-    }
-    
-    .control-btn {
-      font-size: 12px;
-      padding: 8px 12px;
-      min-width: 80px;
-      touch-action: manipulation;
-    }
-    
-    .btn-text {
-      font-size: 12px;
-    }
-    
-    .modal-content {
-      width: 90%;
-      max-width: 350px;
-      padding: 20px;
-      margin: 10px;
-    }
-    
-    .modal-title {
-      font-size: 24px;
-    }
-    
-    .game-title {
-      font-size: 36px;
-    }
   }
+  
+  .control-btn {
+      min-width: 90px;
+  }
+}
 
-  /* Touch device optimizations */
-  @media (hover: none) and (pointer: coarse) {
-    .start-btn, .settings-btn, .game-menu-btn, .game-start-btn {
-      min-height: 44px; /* iOS recommended touch target size */
-      padding: 12px 20px;
-    }
-    
-    .control-btn {
-      min-height: 44px;
-    }
-    
-    .colour-picker {
-      width: 60px;
-      height: 50px;
-    }
+/* Mobile devices (320px - 480px) */
+@media (max-width: 480px) {
+  body {
+      padding: 5px;
+      overflow-x: hidden;
   }
+  
+  #pacman {
+      width: calc(100% - 10px);
+      height: auto;
+      aspect-ratio: 382 / 470;
+      margin: 10px auto;
+      max-width: 382px;
+  }
+  
+  .title-container {
+      margin: 15px auto 10px;
+      padding: 0 10px;
+  }
+  
+  .game-title {
+      font-size: clamp(1.75rem, 10vw, 2.5rem);
+      letter-spacing: 1px;
+  }
+  
+  .title-menu-btn {
+      width: 40px;
+      height: 40px;
+      right: 5px;
+  }
+  
+  .game-controls {
+      top: 8px;
+      right: 8px;
+      gap: 6px;
+  }
+  
+  .control-btn {
+      min-width: 80px;
+      padding: 6px 10px;
+  }
+  
+  .modal {
+      padding: 10px;
+  }
+  
+  .modal-content {
+      padding: 15px;
+      border-width: 2px;
+      max-height: 90vh;
+      overflow-y: auto;
+  }
+  
+  .game-start-container {
+      padding: 0 10px;
+  }
+}
+
+/* Extra small devices (< 360px) */
+@media (max-width: 359px) {
+  .game-title {
+      font-size: clamp(1.5rem, 12vw, 2rem);
+  }
+  
+  .title-menu-btn {
+      width: 36px;
+      height: 36px;
+  }
+  
+  .control-btn {
+      min-width: 70px;
+      font-size: 0.7rem;
+      padding: 6px 8px;
+  }
+  
+  .hamburger-icon {
+      width: 24px;
+      height: 18px;
+  }
+  
+  .hamburger-line {
+      height: 3px;
+  }
+  
+  .modal-content {
+      padding: 12px;
+  }
+  
+  .character-icons {
+      gap: 10px;
+  }
+  
+  .character-icon {
+      max-width: 45px;
+  }
+  
+  .game-over-stats {
+      padding: 10px;
+      gap: 8px;
+  }
+  
+  .stat-item {
+      min-width: 60px;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+  .modal {
+      align-items: flex-start;
+      padding-top: 20px;
+  }
+  
+  .modal-content {
+      max-height: 85vh;
+      overflow-y: auto;
+      margin: 20px auto;
+  }
+  
+  .title-container {
+      margin: 10px auto;
+  }
+  
+  #pacman {
+      margin: 10px auto;
+  }
+  
+  .game-start-container {
+      margin: 10px 0;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .start-btn, 
+  .settings-btn, 
+  .game-menu-btn, 
+  .game-start-btn,
+  .control-btn,
+  .settings-option-btn,
+  .close-btn {
+      min-height: 48px;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+  }
+  
+  .colour-picker {
+      min-width: 52px;
+      min-height: 48px;
+  }
+  
+  /* Prevent double-tap zoom */
+  button, a, input {
+      touch-action: manipulation;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .modal-content {
+      border-width: 2px;
+  }
+  
+  .start-btn, .settings-btn, .game-menu-btn {
+      border-width: 2px;
+  }
+}
+
+/* Dark mode support (if device prefers dark mode) */
+@media (prefers-color-scheme: dark) {
+  body {
+      background-color: #000000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+  }
+  
+  .character-icon {
+      animation: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .game-controls,
+  .modal,
+  .game-start-container {
+      display: none !important;
+  }
+}
