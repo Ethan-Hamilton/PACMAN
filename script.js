@@ -2,10 +2,8 @@
 /*global window: false, document: false */
 
 /*
- * TODO: fix looped audio
- * TODO: add fruits + levels
- * TODO: fix what happens when a ghost is eaten (should go back to base)
- * TODO: do proper ghost mechanics (blinky/wimpy etc)
+ * Pacman Game - HTML5 Canvas Implementation
+ * Features: Touch/swipe controls, customizable colors, audio support
  */
 
 var NONE        = 4,
@@ -19,6 +17,7 @@ var NONE        = 4,
     COUNTDOWN   = 8,
     EATEN_PAUSE = 9,
     DYING       = 10,
+    GAME_OVER   = 12,
     Pacman      = {};
 
 Pacman.FPS = 30;
@@ -79,8 +78,8 @@ Pacman.Ghost = function (game, map, colour) {
         eaten = null;
         eatable = null;
         position = {"x": 90, "y": 80};
-        direction = getRandomDirection();
-        due = getRandomDirection();
+        direction = NONE;
+        due = NONE;
     };
     
     function onWholeSquare(x) {
@@ -194,10 +193,12 @@ Pacman.Ghost = function (game, map, colour) {
 
         ctx.beginPath();
         ctx.fillStyle = "#000";
-        ctx.arc(left+6+off[direction][0], top+6+off[direction][1], 
-                s / 15, 0, 300, false);
-        ctx.arc((left+s)-6+off[direction][0], top+6+off[direction][1], 
-                s / 15, 0, 300, false);
+        if (off[direction]) {
+            ctx.arc(left+6+off[direction][0], top+6+off[direction][1], 
+                    s / 15, 0, 300, false);
+            ctx.arc((left+s)-6+off[direction][0], top+6+off[direction][1], 
+                    s / 15, 0, 300, false);
+        }
         ctx.closePath();
         ctx.fill();
 
@@ -285,9 +286,7 @@ Pacman.User = function (game, map) {
         lives     = null,
         score     = 5,
         keyMap    = {},
-        fruitSpawned = false,
-        currentFruit = null,
-        fruitSpawnTime = null;
+        audio     = game.audio;
     
     keyMap[KEY.ARROW_LEFT]  = LEFT;
     keyMap[KEY.ARROW_UP]    = UP;
@@ -322,15 +321,12 @@ Pacman.User = function (game, map) {
     function newLevel() {
         resetPosition();
         eaten = 0;
-        fruitSpawned = false;
-        currentFruit = null;
-        fruitSpawnTime = null;
     };
     
     function resetPosition() {
-        position = {"x": 90, "y": 120};
-        direction = LEFT;
-        due = LEFT;
+        position = {"x": 90, "y": 160};
+        direction = NONE;
+        due = NONE;
     };
     
     function reset() {
@@ -338,47 +334,6 @@ Pacman.User = function (game, map) {
         resetPosition();
     };
 
-    function spawnFruit() {
-        if (!fruitSpawned && (eaten === 70 || eaten === 170)) {
-            // Spawn fruit below the ghost house
-            // Ghost house is at rows 9-10, columns 8-10
-            // Looking at the map, row 12 (index 11) has empty spaces
-            // First fruit at 70 dots, second at 170 dots
-            var fruitType = eaten === 70 ? 0 : 1; // Cherry for first, Strawberry for second
-            currentFruit = {
-                type: fruitType,
-                position: { x: 90, y: 120 }, // Below ghost house (row 12, column 9)
-                points: Pacman.FRUITS[fruitType].points
-            };
-            fruitSpawned = true;
-            fruitSpawnTime = game.getTick();
-        }
-    };
-
-    function checkFruitCollection() {
-        if (currentFruit) {
-            var distance = Math.sqrt(
-                Math.pow(position.x - currentFruit.position.x, 2) + 
-                Math.pow(position.y - currentFruit.position.y, 2)
-            );
-            
-            if (distance < 15) {
-                addScore(currentFruit.points);
-                currentFruit = null;
-                fruitSpawned = false;
-            }
-        }
-    };
-
-    function updateFruit() {
-        if (currentFruit && fruitSpawnTime) {
-            // Remove fruit after 10 seconds (300 ticks at 30 FPS)
-            if (game.getTick() - fruitSpawnTime > 300) {
-                currentFruit = null;
-                fruitSpawned = false;
-            }
-        }
-    };        
     
     function keyDown(e) {
         if (typeof keyMap[e.keyCode] !== "undefined") { 
@@ -389,6 +344,53 @@ Pacman.User = function (game, map) {
         }
         return true;
 	};
+
+    // Touch/swipe support for mobile devices
+    var touchStartX = 0;
+    var touchStartY = 0;
+    var touchEndX = 0;
+    var touchEndY = 0;
+    var minSwipeDistance = 30; // Minimum distance for a swipe
+
+    function handleTouchStart(e) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+    }
+
+    function handleTouchEnd(e) {
+        touchEndX = e.changedTouches[0].clientX;
+        touchEndY = e.changedTouches[0].clientY;
+        handleSwipe();
+    }
+
+    function handleSwipe() {
+        var deltaX = touchEndX - touchStartX;
+        var deltaY = touchEndY - touchStartY;
+        var absDeltaX = Math.abs(deltaX);
+        var absDeltaY = Math.abs(deltaY);
+
+        // Only process if swipe distance is sufficient
+        if (absDeltaX < minSwipeDistance && absDeltaY < minSwipeDistance) {
+            return;
+        }
+
+        // Determine swipe direction
+        if (absDeltaX > absDeltaY) {
+            // Horizontal swipe
+            if (deltaX > 0) {
+                due = RIGHT; // Swipe right
+            } else {
+                due = LEFT;  // Swipe left
+            }
+        } else {
+            // Vertical swipe
+            if (deltaY > 0) {
+                due = DOWN;  // Swipe down
+            } else {
+                due = UP;    // Swipe up
+            }
+        }
+    }
 
     function getNewCoord(dir, current) {   
         return {
@@ -485,8 +487,11 @@ Pacman.User = function (game, map) {
             addScore((block === Pacman.BISCUIT) ? 10 : 50);
             eaten += 1;
             
-            // Check for fruit spawning
-            spawnFruit();
+            // Play eating sound
+            if (block === Pacman.BISCUIT) {
+                audio.play("eating");
+            }
+            
             
             if (eaten === 182) {
                 game.completedLevel();
@@ -497,11 +502,6 @@ Pacman.User = function (game, map) {
             }
         }
         
-        // Check for fruit collection
-        checkFruitCollection();
-        
-        // Update fruit state
-        updateFruit();   
                 
         return {
             "new" : position,
@@ -569,33 +569,12 @@ Pacman.User = function (game, map) {
         ctx.fill();    
     };
 
-    function drawFruit(ctx) {
-        if (currentFruit) {
-            var s = map.blockSize;
-            var fruit = Pacman.FRUITS[currentFruit.type];
-            var x = (currentFruit.position.x / 10) * s;
-            var y = (currentFruit.position.y / 10) * s;
-            
-            // Draw fruit as a colored circle
-            ctx.fillStyle = fruit.color;
-            ctx.beginPath();
-            ctx.arc(x + s / 2, y + s / 2, s / 3, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Add a small highlight
-            ctx.fillStyle = "#FFFFFF";
-            ctx.beginPath();
-            ctx.arc(x + s / 2 - 2, y + s / 2 - 2, s / 8, 0, Math.PI * 2);
-            ctx.fill();
-        }
-    };
     
     initUser();
 
     return {
         "draw"          : draw,
         "drawDead"      : drawDead,
-        "drawFruit"     : drawFruit,
         "loseLife"      : loseLife,
         "getLives"      : getLives,
         "score"         : score,
@@ -605,7 +584,9 @@ Pacman.User = function (game, map) {
         "move"          : move,
         "newLevel"      : newLevel,
         "reset"         : reset,
-        "resetPosition" : resetPosition
+        "resetPosition" : resetPosition,
+        "handleTouchStart" : handleTouchStart,
+        "handleTouchEnd"   : handleTouchEnd
     };
 };
 
@@ -694,9 +675,10 @@ Pacman.Map = function (size) {
 
     function drawPills(ctx) { 
 
-        if (++pillSize > 30) {
-            pillSize = 0;
-        }
+        // Remove animation - keep pills at constant size
+        // if (++pillSize > 30) {
+        //     pillSize = 0;
+        // }
         
         for (i = 0; i < height; i += 1) {
 		    for (j = 0; j < width; j += 1) {
@@ -710,7 +692,7 @@ Pacman.Map = function (size) {
                     ctx.fillStyle = "#FFF";
                     ctx.arc((j * blockSize) + blockSize / 2,
                             (i * blockSize) + blockSize / 2,
-                            Math.abs(5 - (pillSize/3)), 
+                            5, // Fixed size instead of Math.abs(5 - (pillSize/3))
                             0, 
                             Math.PI * 2, false); 
                     ctx.fill();
@@ -795,7 +777,6 @@ Pacman.Audio = function(game) {
         
         f.addEventListener("canplaythrough", progressEvents[name], true);
         f.addEventListener("error", function() {
-            console.log("Audio file failed to load: " + path);
             // Continue without this audio file
             if (typeof cb === "function") {
                 cb();
@@ -845,7 +826,7 @@ Pacman.Audio = function(game) {
             playing.push(name);
             files[name].addEventListener("ended", endEvents[name], true);
             files[name].play().catch(function(error) {
-                console.log("Audio play failed: " + error);
+                // Audio play failed - continue silently
             });
         }
     };
@@ -919,9 +900,20 @@ var PACMAN = (function () {
         for (var i = 0; i < ghosts.length; i += 1) { 
             ghosts[i].reset();
         }
+        
+        // Clear the canvas completely to remove any stuck ghosts
+        if (ctx) {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            map.draw(ctx);
+            
+            // Force clear the starting position to prevent ghost Pacman
+            var startPos = user.position || {"x": 90, "y": 160};
+            redrawBlock(startPos);
+        }
+        
         audio.play("start");
         timerStart = tick;
-        setState(COUNTDOWN);
+        setState(PLAYING);
     }    
 
     function startNewGame() {
@@ -934,9 +926,8 @@ var PACMAN = (function () {
     }
 
     function keyDown(e) {
-        if (e.keyCode === KEY.SPACEBAR) {
-            startNewGame();
-        } else if (e.keyCode === KEY.S) {
+        // Spacebar start functionality removed - now handled by start button
+        if (e.keyCode === KEY.S) {
             audio.disableSound();
             localStorage["soundDisabled"] = !soundDisabled();
         } else if (e.keyCode === KEY.H) {
@@ -966,20 +957,12 @@ var PACMAN = (function () {
             audio.resume();
             map.draw(ctx);
             setState(stored);
-            // Update pause button text
-            if (typeof window.updatePauseButtonText === 'function') {
-                window.updatePauseButtonText(false);
-            }
         } else if (e.keyCode === KEY.P) {
             stored = state;
             setState(PAUSE);
             audio.pause();
             map.draw(ctx);
             dialog("Paused");
-            // Update pause button text
-            if (typeof window.updatePauseButtonText === 'function') {
-                window.updatePauseButtonText(true);
-            }
         } else if (state !== PAUSE) {   
             return user.keyDown(e);
         }
@@ -991,12 +974,80 @@ var PACMAN = (function () {
         user.loseLife();
         if (user.getLives() > 0) {
             startLevel();
+        } else {
+            // Game over - show game over modal
+            setState(GAME_OVER);
+            showGameOverModal();
         }
     }
 
     function setState(nState) { 
         state = nState;
         stateChanged = true;
+    };
+
+    function enableCharacterMovement() {
+        // Enable movement for ghosts by giving them random directions
+        var directions = [UP, DOWN, LEFT, RIGHT];
+        for (var i = 0; i < ghosts.length; i += 1) {
+            if (ghosts[i].direction === NONE) {
+                ghosts[i].direction = directions[Math.floor(Math.random() * directions.length)];
+                ghosts[i].due = directions[Math.floor(Math.random() * directions.length)];
+            }
+        }
+    };
+
+    function showGameOverModal() {
+        // Update final score and level
+        document.getElementById('final-score').textContent = user.theScore();
+        document.getElementById('final-level').textContent = level;
+        
+        // Show the game over modal
+        var gameOverModal = document.getElementById('game-over-modal');
+        if (gameOverModal) {
+            gameOverModal.classList.remove('hidden');
+        }
+        
+        // Stop the game timer
+        if (timer) {
+            clearInterval(timer);
+            timer = null;
+        }
+    };
+
+    function restartGame() {
+        // Hide game over modal
+        var gameOverModal = document.getElementById('game-over-modal');
+        if (gameOverModal) {
+            gameOverModal.classList.add('hidden');
+        }
+        
+        // Show game controls and start button
+        var gameControls = document.getElementById('game-controls');
+        var gameStartContainer = document.getElementById('game-start-container');
+        if (gameControls && gameStartContainer) {
+            gameControls.classList.remove('hidden');
+            gameStartContainer.classList.add('show');
+        }
+        
+        // Clear the existing canvas
+        var pacmanDiv = document.getElementById("pacman");
+        if (pacmanDiv) {
+            pacmanDiv.innerHTML = "";
+        }
+        
+        // Reinitialize the game completely
+        var el = document.getElementById("pacman");
+        if (el && typeof PACMAN !== 'undefined' && PACMAN.init) {
+            PACMAN.init(el, "");
+            // Set game as initialized after successful init
+            if (typeof gameInitialized !== 'undefined') {
+                gameInitialized = true;
+            }
+        }
+        
+        // Don't start the game automatically - wait for user to click start button
+        // The game will start when user clicks the "START GAME" button
     };
     
     function collided(user, ghost) {
@@ -1007,37 +1058,71 @@ var PACMAN = (function () {
     function drawFooter() {
         
         var topLeft  = (map.height * map.blockSize),
-            textBase = topLeft + 17;
+            textBase = topLeft + 17,
+            canvasWidth = map.width * map.blockSize;
         
         ctx.fillStyle = "#000000";
-        ctx.fillRect(0, topLeft, (map.width * map.blockSize), 30);
+        ctx.fillRect(0, topLeft, canvasWidth, 30);
         
+        // Calculate positions for true 1/3, 2/3, 3/3 layout
+        var oneThird = canvasWidth / 3;
+        var twoThirds = (canvasWidth / 3) * 2;
+        
+        // Draw Score at 1/3 position (left section)
         ctx.fillStyle = "#FFFF00";
-
-        for (var i = 0, len = user.getLives(); i < len; i++) {
+        ctx.font = "14px Calibri";
+        var scoreText = "Score: " + user.theScore();
+        var scoreWidth = ctx.measureText(scoreText).width;
+        ctx.fillText(scoreText, (oneThird / 2) - (scoreWidth / 2), textBase);
+        
+        // Draw Lives at center (2/3 position - middle section)
+        var numLives = user.getLives();
+        var livesWidth = numLives * 25 - 5; // Total width of all lives
+        var centerX = canvasWidth / 2;
+        var livesStartX = centerX - livesWidth / 2;
+        
+        for (var i = 0; i < numLives; i++) {
             var pacmanColour = localStorage.getItem("pacmanColour") || "#FFFF00";
             ctx.fillStyle = pacmanColour;
             ctx.beginPath();
-            ctx.moveTo(150 + (25 * i) + map.blockSize / 2,
+            ctx.moveTo(livesStartX + (25 * i) + map.blockSize / 2,
                        (topLeft+1) + map.blockSize / 2);
             
-            ctx.arc(150 + (25 * i) + map.blockSize / 2,
+            ctx.arc(livesStartX + (25 * i) + map.blockSize / 2,
                     (topLeft+1) + map.blockSize / 2,
                     map.blockSize / 2, Math.PI * 0.25, Math.PI * 1.75, false);
             ctx.fill();
         }
-
-        // Sound toggle indicator removed
-
+        
+        // Draw Level at 3/3 position (right section)
         ctx.fillStyle = "#FFFF00";
-        ctx.font      = "14px Calibri";
-        ctx.fillText("Score: " + user.theScore(), 30, textBase);
-        ctx.fillText("Level: " + level, 260, textBase);
+        var levelText = "Level: " + level;
+        var levelWidth = ctx.measureText(levelText).width;
+        var rightSectionCenter = twoThirds + (oneThird / 2);
+        ctx.fillText(levelText, rightSectionCenter - (levelWidth / 2), textBase);
     }
 
     function redrawBlock(pos) {
-        map.drawBlock(Math.floor(pos.y/10), Math.floor(pos.x/10), ctx);
-        map.drawBlock(Math.ceil(pos.y/10), Math.ceil(pos.x/10), ctx);
+        if (pos && pos.x !== undefined && pos.y !== undefined) {
+            var s = map.blockSize;
+            var y1 = Math.floor(pos.y/10);
+            var x1 = Math.floor(pos.x/10);
+            var y2 = Math.ceil(pos.y/10);
+            var x2 = Math.ceil(pos.x/10);
+            
+            // Clear the entire block area with black background
+            ctx.fillStyle = "#000";
+            ctx.fillRect(x1 * s, y1 * s, s, s);
+            if (y2 !== y1 || x2 !== x1) {
+                ctx.fillRect(x2 * s, y2 * s, s, s);
+            }
+            
+            // Redraw the map content (dots, etc.)
+            map.drawBlock(y1, x1, ctx);
+            if (y2 !== y1 || x2 !== x1) {
+                map.drawBlock(y2, x2, ctx);
+            }
+        }
     }
 
     function mainDraw() { 
@@ -1051,16 +1136,21 @@ var PACMAN = (function () {
         }
         u = user.move(ctx);
         
+        // Clear old ghost positions more thoroughly
         for (i = 0, len = ghosts.length; i < len; i += 1) {
-            redrawBlock(ghostPos[i].old);
+            if (ghostPos[i] && ghostPos[i].old) {
+                redrawBlock(ghostPos[i].old);
+            }
         }
-        redrawBlock(u.old);
+        // Always clear the old position, even if it's the same as new position initially
+        if (u.old) {
+            redrawBlock(u.old);
+        }
         
         for (i = 0, len = ghosts.length; i < len; i += 1) {
             ghosts[i].draw(ctx);
         }                     
         user.draw(ctx);
-        user.drawFruit(ctx);
         
         userPos = u["new"];
         
@@ -1095,11 +1185,16 @@ var PACMAN = (function () {
         map.drawPills(ctx);
 
         if (state === PLAYING) {
+            // Enable movement for characters when game starts
+            if (stateChanged) {
+                enableCharacterMovement();
+                stateChanged = false;
+            }
             mainDraw();
         } else if (state === WAITING && stateChanged) {            
             stateChanged = false;
             map.draw(ctx);
-            dialog("Press SPACEBAR to start a New game");            
+            dialog("Ready to Play!");            
         } else if (state === EATEN_PAUSE && 
                    (tick - timerStart) > (Pacman.FPS / 3)) {
             map.draw(ctx);
@@ -1129,6 +1224,10 @@ var PACMAN = (function () {
                     dialog("Starting in: " + diff);
                 }
             }
+        } else if (state === GAME_OVER && stateChanged) {
+            stateChanged = false;
+            map.draw(ctx);
+            dialog("Game Over!");
         } 
 
         drawFooter();
@@ -1148,6 +1247,13 @@ var PACMAN = (function () {
         level += 1;
         map.reset();
         user.newLevel();
+        
+        // Clear the canvas before starting new level
+        if (ctx) {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            map.draw(ctx);
+        }
+        
         startLevel();
     };
 
@@ -1175,7 +1281,9 @@ var PACMAN = (function () {
         map   = new Pacman.Map(blockSize);
         user  = new Pacman.User({ 
             "completedLevel" : completedLevel, 
-            "eatenPill"      : eatenPill 
+            "eatenPill"      : eatenPill,
+            "audio"          : audio,
+            "getTick"        : getTick
         }, map);
 
         for (i = 0, len = ghostSpecs.length; i < len; i += 1) {
@@ -1189,12 +1297,12 @@ var PACMAN = (function () {
         var extension = Modernizr.audio.ogg ? 'ogg' : 'mp3';
 
         var audio_files = [
-            ["start", "audio/opening_song." + extension],
-            ["die", "audio/die." + extension],
-            ["eatghost", "audio/eatghost." + extension],
-            ["eatpill", "audio/eatpill." + extension],
-            ["eating", "audio/eating.short." + extension],
-            ["eating2", "audio/eating.short." + extension]
+            ["start", "assets/audio/pacman_beginning." + extension],
+            ["die", "assets/audio/pacman_death." + extension],
+            ["eatghost", "assets/audio/pacman_eatghost." + extension],
+            ["eatpill", "assets/audio/pacman_intermission." + extension],
+            ["eating", "assets/audio/pacman_chomp." + extension],
+            ["eating2", "assets/audio/pacman_chomp." + extension]
         ];
 
         load(audio_files, function() { loaded(); });
@@ -1212,16 +1320,31 @@ var PACMAN = (function () {
         
     function loaded() {
 
-        dialog("Press SPACEBAR to Start");
+        dialog("Ready to Play!");
         
         document.addEventListener("keydown", keyDown, true);
         document.addEventListener("keypress", keyPress, true); 
+        
+        // Add touch event listeners for mobile support
+        document.addEventListener("touchstart", function(e) {
+            if (user && user.handleTouchStart) {
+                user.handleTouchStart(e);
+            }
+        }, { passive: true });
+        
+        document.addEventListener("touchend", function(e) {
+            if (user && user.handleTouchEnd) {
+                user.handleTouchEnd(e);
+            }
+        }, { passive: true });
         
         timer = window.setInterval(mainLoop, 1000 / Pacman.FPS);
     };
     
     return {
-        "init" : init
+        "init" : init,
+        "startNewGame" : startNewGame,
+        "restartGame" : restartGame
     };
     
 }());
@@ -1253,19 +1376,7 @@ Pacman.BISCUIT = 1;
 Pacman.EMPTY   = 2;
 Pacman.BLOCK   = 3;
 Pacman.PILL    = 4;
-Pacman.FRUIT   = 5;
 
-// Fruit types and their point values
-Pacman.FRUITS = [
-    { name: "Cherry", points: 100, color: "#FF0000" },
-    { name: "Strawberry", points: 300, color: "#FF69B4" },
-    { name: "Orange", points: 500, color: "#FFA500" },
-    { name: "Apple", points: 700, color: "#FF0000" },
-    { name: "Melon", points: 1000, color: "#00FF00" },
-    { name: "Galaxian", points: 2000, color: "#0000FF" },
-    { name: "Bell", points: 3000, color: "#FFFF00" },
-    { name: "Key", points: 5000, color: "#FFD700" }
-];
 
 Pacman.MAP = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -1280,11 +1391,11 @@ Pacman.MAP = [
 	[0, 0, 0, 0, 1, 0, 1, 0, 0, 3, 0, 0, 1, 0, 1, 0, 0, 0, 0],
 	[2, 2, 2, 2, 1, 1, 1, 0, 3, 3, 3, 0, 1, 1, 1, 2, 2, 2, 2],
 	[0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
-	[2, 2, 2, 0, 1, 0, 1, 1, 1, 2, 1, 1, 1, 0, 1, 0, 2, 2, 2],
+	[2, 2, 2, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 2, 2, 2],
 	[0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
 	[0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
 	[0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0],
-	[0, 4, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 4, 0],
+	[0, 4, 1, 0, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 0, 1, 4, 0],
 	[0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0],
 	[0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0],
 	[0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
@@ -1427,16 +1538,27 @@ $(function(){
   
   // Game control elements
   var gameControls = document.getElementById("game-controls");
-  var pauseBtn = document.getElementById("pause-btn");
-  var homeBtn = document.getElementById("home-btn");
-  var gameSettingsBtn = document.getElementById("game-settings-btn");
+  var titleMenuBtn = document.getElementById("title-menu-btn");
+  var gameMenuModal = document.getElementById("game-menu-modal");
+  var resumeBtn = document.getElementById("resume-btn");
+  var settingsMenuBtn = document.getElementById("settings-menu-btn");
+  var quitMenuBtn = document.getElementById("quit-menu-btn");
+  
+  // Game start button elements
+  var gameStartContainer = document.getElementById("game-start-container");
+  var gameStartBtn = document.getElementById("game-start-btn");
+  
+  // Game over modal elements
+  var gameOverModal = document.getElementById("game-over-modal");
+  var restartGameBtn = document.getElementById("restart-game-btn");
+  var gameOverHomeBtn = document.getElementById("game-over-home-btn");
 
   // Start game functionality
   startBtn.addEventListener("click", function() {
     startModal.classList.add("hidden");
     gameControls.classList.remove("hidden"); // Show game controls
-    // Reset pause button to "PAUSE" state
-    window.updatePauseButtonText(false);
+    // Show the game start button
+    gameStartContainer.classList.add("show");
     if (!gameInitialized) {
       initializeGame();
     } else {
@@ -1447,37 +1569,110 @@ $(function(){
     }
   });
 
+  // Game start button functionality with countdown
+  gameStartBtn.addEventListener("click", function() {
+    startGameWithCountdown();
+  });
+
+  function startGameWithCountdown() {
+    var countdownElement = gameStartBtn;
+    var count = 3;
+    
+    // Disable the button during countdown
+    gameStartBtn.disabled = true;
+    
+    function showCountdown() {
+      if (count > 0) {
+        countdownElement.textContent = count;
+        count--;
+        setTimeout(showCountdown, 1000);
+      } else {
+        countdownElement.textContent = "GO!";
+        setTimeout(function() {
+          // Hide the start button and start the game
+          gameStartContainer.classList.remove("show");
+          gameStartBtn.disabled = false;
+          gameStartBtn.textContent = "START GAME";
+          
+          // Show burger menu icon when game actually starts
+          titleMenuBtn.classList.add("show");
+          
+          // Start the actual game
+          if (typeof PACMAN !== 'undefined' && PACMAN.startNewGame) {
+            PACMAN.startNewGame();
+          }
+        }, 500);
+      }
+    }
+    
+    showCountdown();
+  }
+
   // Settings modal functionality
   settingsBtn.addEventListener("click", function() {
     startModal.classList.add("hidden");
     settingsModal.classList.remove("hidden");
   });
 
-  // Game control button functionality
-  pauseBtn.addEventListener("click", function() {
-    // Trigger pause functionality using the existing P key handler
+  // Title menu button functionality
+  titleMenuBtn.addEventListener("click", function() {
+    // Pause the game when opening menu
     var pauseEvent = new KeyboardEvent('keydown', { keyCode: KEY.P });
     document.dispatchEvent(pauseEvent);
+    gameMenuModal.classList.remove("hidden");
   });
 
-  // Function to update pause button text based on game state
-  window.updatePauseButtonText = function(isPaused) {
-    var pauseBtnText = pauseBtn.querySelector('.btn-text');
-    if (isPaused) {
-      pauseBtnText.textContent = 'RESUME';
-      pauseBtn.title = 'Resume Game (P)';
-    } else {
-      pauseBtnText.textContent = 'PAUSE';
-      pauseBtn.title = 'Pause Game (P)';
+  // Resume button functionality
+  resumeBtn.addEventListener("click", function() {
+    gameMenuModal.classList.add("hidden");
+    // Start countdown before resuming
+    startResumeCountdown();
+  });
+
+  function startResumeCountdown() {
+    // Show the game start container and use the existing button for countdown
+    gameStartContainer.classList.add("show");
+    gameStartBtn.disabled = true;
+    
+    var count = 3;
+    
+    function showCountdown() {
+      if (count > 0) {
+        gameStartBtn.textContent = count;
+        count--;
+        setTimeout(showCountdown, 1000);
+      } else {
+        gameStartBtn.textContent = "GO!";
+        setTimeout(function() {
+          // Hide the countdown and resume game
+          gameStartContainer.classList.remove("show");
+          gameStartBtn.disabled = false;
+          gameStartBtn.textContent = "START GAME";
+          
+          // Resume the game
+          var pauseEvent = new KeyboardEvent('keydown', { keyCode: KEY.P });
+          document.dispatchEvent(pauseEvent);
+        }, 500);
+      }
     }
+    
+    showCountdown();
   }
 
-  homeBtn.addEventListener("click", function() {
+  // Settings button functionality
+  settingsMenuBtn.addEventListener("click", function() {
+    gameMenuModal.classList.add("hidden");
+    settingsModal.classList.remove("hidden");
+  });
+
+  // Quit button functionality
+  quitMenuBtn.addEventListener("click", function() {
     // Return to main menu
     gameControls.classList.add("hidden");
+    gameStartContainer.classList.remove("show");
+    gameMenuModal.classList.add("hidden");
+    titleMenuBtn.classList.remove("show"); // Hide burger menu icon
     startModal.classList.remove("hidden");
-    // Reset pause button to "PAUSE" state
-    window.updatePauseButtonText(false);
     
     // Clean up the game completely
     if (typeof PACMAN !== 'undefined') {
@@ -1501,11 +1696,6 @@ $(function(){
     setTimeout(function() {
       location.reload();
     }, 100);
-  });
-
-  gameSettingsBtn.addEventListener("click", function() {
-    // Open settings modal
-    settingsModal.classList.remove("hidden");
   });
 
   // Update close settings button to handle both scenarios
@@ -1715,5 +1905,48 @@ $(function(){
   
   // Draw static Ghost once
   drawStaticModalGhost();
+
+  // Game over modal functionality
+  restartGameBtn.addEventListener("click", function() {
+    // Reset the game initialization flag
+    gameInitialized = false;
+    if (typeof PACMAN !== 'undefined' && PACMAN.restartGame) {
+      PACMAN.restartGame();
+    }
+  });
+
+  gameOverHomeBtn.addEventListener("click", function() {
+    // Hide game over modal
+    gameOverModal.classList.add("hidden");
+    
+    // Return to main menu
+    gameControls.classList.add("hidden");
+    gameStartContainer.classList.remove("show");
+    titleMenuBtn.classList.remove("show");
+    startModal.classList.remove("hidden");
+    
+    // Clean up the game completely
+    if (typeof PACMAN !== 'undefined') {
+      // Stop the game timer
+      if (PACMAN.timer) {
+        clearInterval(PACMAN.timer);
+        PACMAN.timer = null;
+      }
+      
+      // Clear the canvas
+      var pacmanDiv = document.getElementById("pacman");
+      if (pacmanDiv) {
+        pacmanDiv.innerHTML = "";
+      }
+      
+      // Reset game state
+      gameInitialized = false;
+    }
+    
+    // Force a complete page refresh to ensure clean state
+    setTimeout(function() {
+      location.reload();
+    }, 100);
+  });
 });
 
