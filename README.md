@@ -2,14 +2,15 @@
 
 <div align="center">
 
-![Pacman](https://img.shields.io/badge/Game-Pacman-yellow?style=for-the-badge&logo=pac-man)
+![Pacman Logo](https://img.shields.io/badge/PACMAN-FFD700?style=for-the-badge&logo=pac-man&logoColor=black&labelColor=0000FF)
+
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
 **A classic arcade game reimagined with modern web technologies!**
 
-[Play Now](#-quick-start) • [Features](#-features) • [Controls](#-controls) • [Installation](#-installation)
+[🎮 Play Now](https://ethan-hamilton.github.io/PACMAN/) • [Features](#-features) • [Controls](#-controls) • [Installation](#-installation)
 
 </div>
 
@@ -51,21 +52,30 @@ Experience the nostalgic thrill of **Pacman** right in your browser! This HTML5 
 | **H** | Return to Home Menu |
 
 ### 📱 Mobile
-- **Swipe** in any direction to move Pacman
-- **Tap** the burger menu (☰) to access game options
+| Gesture | Action |
+|---------|--------|
+| **Swipe Up** | Move Pacman Up |
+| **Swipe Down** | Move Pacman Down |
+| **Swipe Left** | Move Pacman Left |
+| **Swipe Right** | Move Pacman Right |
+| **Tap** | Access Game Menu |
+| **Tap Burger Menu (☰)** | Open Settings/Options |
 
 ## 🚀 Quick Start
 
-### Option 1: Play Directly
+### Option 1: Play Online (Recommended)
+**[🎮 Play Now - Live Demo](https://ethan-hamilton.github.io/PACMAN/)**
+
+### Option 2: Play Locally
 1. Clone this repository
 2. Open `index.html` in your browser
 3. Click **"LET'S GO!!!"** and start playing!
 
-### Option 2: Local Server (Recommended)
+### Option 3: Local Server
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/pacman.git
-cd pacman
+git clone https://github.com/ethan-hamilton/PACMAN.git
+cd PACMAN
 
 # Start a simple HTTP server
 # Python 3
@@ -89,10 +99,10 @@ Then open `http://localhost:8000` in your browser.
 ### Setup
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/pacman.git
+git clone https://github.com/ethan-hamilton/PACMAN.git
 
 # Navigate to project directory
-cd pacman
+cd PACMAN
 
 # Open in browser
 start index.html  # Windows
@@ -207,7 +217,7 @@ This project is created for educational purposes. Pac-Man is a trademark of Band
 
 ⭐ Star this repo if you enjoyed the game!
 
-[Report Bug](https://github.com/yourusername/pacman/issues) • [Request Feature](https://github.com/yourusername/pacman/issues)
+[Report Bug](https://github.com/ethan-hamilton/PACMAN/issues) • [Request Feature](https://github.com/ethan-hamilton/PACMAN/issues)
 
 </div>
 
